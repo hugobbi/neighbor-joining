@@ -8,6 +8,28 @@ https://moodle.ufrgs.br/pluginfile.php/5635441/mod_resource/content/0/Phylogenet
 https://medium.com/geekculture/phylogenetic-trees-implement-in-python-3f9df96c0c32
 '''
 
+def neighbor_joining(distance_matrix) -> np.matrix:
+    d = np.copy(distance_matrix)
+    n = d.shape[0]
+    q_matrix = np.zeros((n,n))
+
+    for k in range(n-2):
+        for i in range(n):
+            for j in range(n):
+                if i != j:
+                    q_matrix[i,j] = (n-2)*d[i,j] - d[i, 0:].sum() - d[0:, j].sum()
+        
+        i, j = np.unravel_index(np.argmin(q_matrix), q_matrix.shape)
+
+        #dij = (D[i][j] + (np.sum(D[i]) - np.sum(D[j])) / (n-2)) / 2
+        
+        #dist_i_new_node = 1/2*d[i,j] + (1/(2*(n-2)))*(d.sum[i, 1:]-d.sum[1:, j])
+        
+        print(d)
+        print(q_matrix)
+
+        print(f"{i=} {j=}")
+
 '''
  	L. braziliensis 	T. rangeli 	T. cruzi 	T. gambiae
 L. braziliensis 	0.000 	0.010 	0.300 	0.280
@@ -28,21 +50,10 @@ CONVERSION_DICT = {
     3: 'T. gambiae'
 }
 
-def sum_array(matrix, n, i):
-    sum = 0
-    for k in range(1, n):
-        sum += matrix(i, k)
+d2 = np.matrix([[0, 5, 9, 9, 8],
+                [5, 0, 10, 10, 9],
+                [9, 10, 0, 8, 7],
+                [9, 10, 8, 0, 3],
+                [8, 9, 7, 3, 0]])
 
-def neighbor_joining(d) -> np.matrix:
-    n = d.shape[0]
-    q_matrix = np.zeros((n,n))
-
-    for i in range(n):
-        for j in range(n):
-            q_matrix[i,j] = (n-2)*d[i,j] - d[i, 1:].sum() - d[1:, j].sum()
-
-    print(d)
-    print(q_matrix)
-
-
-neighbor_joining(distance_matrix)
+neighbor_joining(d2)
