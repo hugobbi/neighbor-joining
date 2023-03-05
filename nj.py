@@ -11,9 +11,11 @@ https://medium.com/geekculture/phylogenetic-trees-implement-in-python-3f9df96c0c
 def neighbor_joining(distance_matrix) -> np.matrix:
     d = np.copy(distance_matrix)
     n = d.shape[0]
-    q_matrix = np.zeros((n,n))
 
-    for k in range(n-2):
+    for _ in range(n-2):
+        n = d.shape[0]
+        q_matrix = np.zeros((n,n))
+        
         for i in range(n):
             for j in range(n):
                 if i != j:
@@ -21,14 +23,31 @@ def neighbor_joining(distance_matrix) -> np.matrix:
         
         i, j = np.unravel_index(np.argmin(q_matrix), q_matrix.shape)
 
-        #dij = (D[i][j] + (np.sum(D[i]) - np.sum(D[j])) / (n-2)) / 2
-        
-        #dist_i_new_node = 1/2*d[i,j] + (1/(2*(n-2)))*(d.sum[i, 1:]-d.sum[1:, j])
-        
-        print(d)
-        print(q_matrix)
-
+        print(f"{q_matrix=}")
         print(f"{i=} {j=}")
+        
+        delta_ij = (d[i, 0:].sum() + d[0:, j].sum()) / (n-2)
+        branch_length_i = 1/2 * (d[i,j] + delta_ij)
+        branch_length_j = 1/2 * (d[i,j] - delta_ij)
+        
+        '''
+        Nova matriz removendo as linha/coluna i e j de D 
+        e acrescentando uma linha/coluna m tal que para qualquer
+        k -> Dk,m = (Dk,i + Dk,j - Di,j)/2
+        '''
+
+        dprime = np.zeros((n-1, n-1))
+        for k in range(n-1):
+            for l in range(n-1):
+                if k != l:
+                    if l == i or l == j: # if l is m
+                        dprime[k,l] = (d[k,i] + d[k,j] - d[i,j])/2
+                    else:
+                        dprime[k,l] = d[k,l]
+
+        d = np.copy(dprime)
+        
+        print(f"{d=}")
 
 '''
  	L. braziliensis 	T. rangeli 	T. cruzi 	T. gambiae
@@ -56,4 +75,9 @@ d2 = np.matrix([[0, 5, 9, 9, 8],
                 [9, 10, 8, 0, 3],
                 [8, 9, 7, 3, 0]])
 
-neighbor_joining(d2)
+d3 = np.matrix([[0, 13, 21, 22],
+                [13, 0, 12, 13],
+                [21, 12, 0, 13],
+                [22, 13, 13, 0]])
+
+neighbor_joining(d3)
