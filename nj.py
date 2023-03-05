@@ -36,14 +36,16 @@ def neighbor_joining(distance_matrix) -> np.matrix:
         k -> Dk,m = (Dk,i + Dk,j - Di,j)/2
         '''
 
+        #dprime = np.copy(d) 
+        #dprime = np.delete(dprime, i, 0)
+        #dprime = np.delete(dprime, i, 1)
+        #dprime = np.delete(dprime, j, 0)
+        #dprime = np.delete(dprime, j, 1)
+
         dprime = np.zeros((n-1, n-1))
         for k in range(n-1):
-            for l in range(n-1):
-                if k != l:
-                    if l == i or l == j: # if l is m
-                        dprime[k,l] = (d[k,i] + d[k,j] - d[i,j])/2
-                    else:
-                        dprime[k,l] = d[k,l]
+            dprime[i, k] = (d[k+1,i] + d[k+1,j] - d[i,j])/2
+            dprime[k, i] = (d[k+1,i] + d[k+1,j] - d[i,j])/2
 
         d = np.copy(dprime)
         
