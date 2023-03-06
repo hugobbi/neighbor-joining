@@ -1,5 +1,4 @@
 import numpy as np
-from Bio import Phylo
 
 '''
 Source:
@@ -40,19 +39,20 @@ def neighbor_joining(distance_matrix, conversion_dict) -> np.matrix:
         '''
 
         dprime = np.copy(d) 
-        dprime = np.delete(dprime, j, 0)
+        dprime = np.delete(dprime, j, 0) # removes jth row/column
         dprime = np.delete(dprime, j, 1)
         remaining_idx = [r_idx for r_idx in range(n) if r_idx != i]
-        for k, r_idx in enumerate(remaining_idx): # i row/column will become new node row/column
-            new_distance = (d[r_idx,i] + d[r_idx,j] - d[i,j])/2
-            dprime[i, k] = new_distance
-            dprime[k, i] = new_distance
+        for k, r_idx in enumerate(remaining_idx): # ith row/column will become new node row/column
             if k == i:
                 dprime[i, k] = 0
                 dprime[k, i] = 0
+            else:
+                new_distance = (d[r_idx,i] + d[r_idx,j] - d[i,j])/2
+                dprime[i, k] = new_distance
+                dprime[k, i] = new_distance
 
         d = np.copy(dprime)
-        n = n-1
+        n -= 1
         print(f"{d=}")
 
         new_node = f"({tree_labels[i]}, {tree_labels[j]})"
@@ -86,14 +86,27 @@ d4 = np.matrix([[0.000, 0.010, 0.300, 0.280],
                 [0.300, 0.280, 0.000, 0.015], 
                 [0.280, 0.270, 0.015, 0.000]])
 
+d5 = np.matrix([[0, 17, 21, 31, 23],
+                [17, 0, 30, 34, 21],
+                [21, 30, 0, 28, 39],
+                [31, 34, 28, 0, 43],
+                [23, 21, 39, 43, 0]])
+
+d6 = np.matrix([[0, 17, 21, 27],
+                [17, 0, 12, 18],
+                [21, 12, 0, 14],
+                [27, 18, 14, 0]])
+
 CONVERSION_DICT = {
     "0": "A",
     "1": "B",
     "2": "C",
     "3": "D",
     "4": "E",
-    "5": "F"
+    "5": "F",
+    "6": "G",
+    "7": "H"
 }
 
-tree = neighbor_joining(d2, CONVERSION_DICT)
+tree = neighbor_joining(d1, CONVERSION_DICT)
 print(tree)
