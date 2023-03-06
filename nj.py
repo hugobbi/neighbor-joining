@@ -44,11 +44,16 @@ def neighbor_joining(distance_matrix, conversion_dict) -> np.matrix:
         dprime = np.delete(dprime, j, 1)
         remaining_idx = [r_idx for r_idx in range(n) if r_idx != i]
         for k, r_idx in enumerate(remaining_idx): # i row/column will become new node row/column
-            dprime[i, k] = (d[r_idx,i] + d[r_idx,j] - d[i,j])/2
-            dprime[k, i] = (d[r_idx,i] + d[r_idx,j] - d[i,j])/2
+            new_distance = (d[r_idx,i] + d[r_idx,j] - d[i,j])/2
+            dprime[i, k] = new_distance
+            dprime[k, i] = new_distance
+            if k == i:
+                dprime[i, k] = 0
+                dprime[k, i] = 0
 
         d = np.copy(dprime)
         n = n-1
+        print(f"{d=}")
 
         new_node = f"({tree_labels[i]}, {tree_labels[j]})"
         new_tree_labels = [tree_label for tree_label in tree_labels if tree_label not in {tree_labels[i], tree_labels[j]}]
@@ -76,6 +81,11 @@ d3 = np.matrix([[0, 13, 21, 22],
                 [21, 12, 0, 13],
                 [22, 13, 13, 0]])
 
+d4 = np.matrix([[0.000, 0.010, 0.300, 0.280], 
+                [0.010, 0.000, 0.280, 0.270],
+                [0.300, 0.280, 0.000, 0.015], 
+                [0.280, 0.270, 0.015, 0.000]])
+
 CONVERSION_DICT = {
     "0": "A",
     "1": "B",
@@ -85,5 +95,5 @@ CONVERSION_DICT = {
     "5": "F"
 }
 
-tree = neighbor_joining(d1, CONVERSION_DICT)
+tree = neighbor_joining(d2, CONVERSION_DICT)
 print(tree)
