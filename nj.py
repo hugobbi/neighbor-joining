@@ -1,4 +1,5 @@
 import numpy as np
+from Bio import Phylo
 
 '''
 Source:
@@ -8,12 +9,14 @@ https://moodle.ufrgs.br/pluginfile.php/5635441/mod_resource/content/0/Phylogenet
 https://medium.com/geekculture/phylogenetic-trees-implement-in-python-3f9df96c0c32
 '''
 
-def neighbor_joining(distance_matrix) -> np.matrix:
+def neighbor_joining(distance_matrix, conversion_dict) -> np.matrix:
     d = np.copy(distance_matrix)
     n = d.shape[0]
 
-    for _ in range(n-2):
-        n = d.shape[0]
+    tree_labels = [conversion_dict[str(i)] for i in range(n)]
+    print(tree_labels)
+
+    while n > 2:
         q_matrix = np.zeros((n,n))
         
         for i in range(n):
@@ -39,33 +42,28 @@ def neighbor_joining(distance_matrix) -> np.matrix:
         dprime = np.copy(d) 
         dprime = np.delete(dprime, j, 0)
         dprime = np.delete(dprime, j, 1)
-        for k in range(n-1): # i row/column will become new node row/column
-            dprime[i, k] = (d[k+1,i] + d[k+1,j] - d[i,j])/2
-            dprime[k, i] = (d[k+1,i] + d[k+1,j] - d[i,j])/2
+        remaining_idx = [r_idx for r_idx in range(n) if r_idx != i]
+        for k, r_idx in enumerate(remaining_idx): # i row/column will become new node row/column
+            dprime[i, k] = (d[r_idx,i] + d[r_idx,j] - d[i,j])/2
+            dprime[k, i] = (d[r_idx,i] + d[r_idx,j] - d[i,j])/2
 
         d = np.copy(dprime)
-        
-        print(f"{d=}")
+        n = n-1
 
-'''
- 	L. braziliensis 	T. rangeli 	T. cruzi 	T. gambiae
-L. braziliensis 	0.000 	0.010 	0.300 	0.280
-T. rangeli 	0.010 	0.000 	0.280 	0.270
-T. cruzi 	0.300 	0.280 	0.000 	0.015
-T. gambiae 	0.280 	0.270 	0.015 	0.000
-'''
+        new_node = f"({tree_labels[i]}, {tree_labels[j]})"
+        new_tree_labels = [tree_label for tree_label in tree_labels if tree_label not in {tree_labels[i], tree_labels[j]}]
+        new_tree_labels.append(new_node)
+        tree_labels = new_tree_labels.copy()
 
-distance_matrix = np.matrix([[0.000, 0.010, 0.300, 0.280], 
-               [0.010, 0.000, 0.280, 0.270],
-               [0.300, 0.280, 0.000, 0.015], 
-               [0.280, 0.270, 0.015, 0.000]])
+    final_label = f"({tree_labels[0]}, {tree_labels[1]});"
+    return final_label
 
-CONVERSION_DICT = {
-    0: 'L. braziliensis',
-    1: 'T. rangeli',
-    2: 'T. cruzi',
-    3: 'T. gambiae'
-}
+d1 = np.matrix([[0.0000000, 1.4230670, 	1.2464736, 	2.4829678, 	1.6023069, 	0.7448415],
+                [1.4230670,	0.0000000,  1.8985344, 	3.1350286, 	2.2543677, 	1.9430337],
+                [1.2464736,	1.8985344, 	0.0000000, 	1.4820114, 	0.6013505, 	1.7664403],
+                [2.4829678,	3.1350286, 	1.4820114, 	0.0000000, 	1.2678046, 	3.0029345],
+                [1.6023069,	2.2543677, 	0.6013505, 	1.2678046, 	0.0000000, 	2.1222736],
+                [0.7448415,	1.9430337, 	1.7664403, 	3.0029345, 	2.1222736, 	0.0000000]])
 
 d2 = np.matrix([[0, 5, 9, 9, 8],
                 [5, 0, 10, 10, 9],
@@ -78,4 +76,14 @@ d3 = np.matrix([[0, 13, 21, 22],
                 [21, 12, 0, 13],
                 [22, 13, 13, 0]])
 
-neighbor_joining(d2)
+CONVERSION_DICT = {
+    "0": "A",
+    "1": "B",
+    "2": "C",
+    "3": "D",
+    "4": "E",
+    "5": "F"
+}
+
+tree = neighbor_joining(d1, CONVERSION_DICT)
+print(tree)
