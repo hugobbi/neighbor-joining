@@ -36,14 +36,10 @@ def neighbor_joining(distance_matrix) -> np.matrix:
         k -> Dk,m = (Dk,i + Dk,j - Di,j)/2
         '''
 
-        #dprime = np.copy(d) 
-        #dprime = np.delete(dprime, i, 0)
-        #dprime = np.delete(dprime, i, 1)
-        #dprime = np.delete(dprime, j, 0)
-        #dprime = np.delete(dprime, j, 1)
-
-        dprime = np.zeros((n-1, n-1))
-        for k in range(n-1):
+        dprime = np.copy(d) 
+        dprime = np.delete(dprime, j, 0)
+        dprime = np.delete(dprime, j, 1)
+        for k in range(n-1): # i row/column will become new node row/column
             dprime[i, k] = (d[k+1,i] + d[k+1,j] - d[i,j])/2
             dprime[k, i] = (d[k+1,i] + d[k+1,j] - d[i,j])/2
 
@@ -82,4 +78,4 @@ d3 = np.matrix([[0, 13, 21, 22],
                 [21, 12, 0, 13],
                 [22, 13, 13, 0]])
 
-neighbor_joining(d3)
+neighbor_joining(d2)
