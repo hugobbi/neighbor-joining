@@ -41,7 +41,17 @@ def neighbor_joining(d, ids):
 
         print(f"{i} {j}")
 
-    final_ids = f"{ids[0], ids[1]}"
+    i, j = (0, 1) # at the end, joing the remaining nodes
+    dist_i_to_u = (1/2 * d[i, j]) + ((d[i].sum() - d[j].sum()) / (2*(n-2)))
+    dist_j_to_u = d[i, j] - dist_i_to_u
+    new_node = f"({ids[i]}: {round(dist_i_to_u, 4)}, {ids[j]}: {round(dist_j_to_u, 4)})"
+    new_ids = [new_node]
+    for id in ids:
+        if id not in {ids[i], ids[j]}:
+            new_ids.append(id)
+    ids = new_ids.copy()
+
+    final_ids = ids[0]
     return final_ids
 
 d1 = np.array([[0.0000000, 1.4230670, 	1.2464736, 	2.4829678, 	1.6023069, 	0.7448415],
