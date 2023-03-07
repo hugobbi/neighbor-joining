@@ -11,7 +11,7 @@ def neighbor_joining(d, ids):
                 if i != j:
                     q[i,j] = (n-2)*d[i,j] - d[i].sum() - d[j].sum()
 
-        i, j = np.unravel_index(np.argmin(q), q.shape)
+        i, j = find_minimum_value_indexes(q)
 
         # calculate distances from new node and its decandants
         dist_i_to_u = (1/2 * d[i, j]) + ((d[i].sum() - d[j].sum()) / (2*(n-2)))
@@ -39,20 +39,22 @@ def neighbor_joining(d, ids):
         d = np.copy(dprime)
         ids = new_ids.copy()
 
-        print(f"{i} {j}")
+    # join last remaining node with the rest of the tree
+    i, j = 0, 1
+    dist_last_node = d[i, j]
+    tree = f"({ids[0]}, {ids[j]}: {round(dist_last_node, 4)});"
 
-    i, j = (0, 1) # at the end, joing the remaining nodes
-    dist_i_to_u = (1/2 * d[i, j]) + ((d[i].sum() - d[j].sum()) / (2*(n-2)))
-    dist_j_to_u = d[i, j] - dist_i_to_u
-    new_node = f"({ids[i]}: {round(dist_i_to_u, 4)}, {ids[j]}: {round(dist_j_to_u, 4)})"
-    new_ids = [new_node]
-    for id in ids:
-        if id not in {ids[i], ids[j]}:
-            new_ids.append(id)
-    ids = new_ids.copy()
+    return tree
 
-    final_ids = ids[0]
-    return final_ids
+def find_minimum_value_indexes(m):
+    '''
+    Finds lowest value in matrix from bottom-left corner
+    '''
+    i, j = np.unravel_index(np.argmin(m), m.shape)
+    i, j = j, i
+    indexes = (i, j)
+
+    return indexes
 
 d1 = np.array([[0.0000000, 1.4230670, 	1.2464736, 	2.4829678, 	1.6023069, 	0.7448415],
                 [1.4230670,	0.0000000,  1.8985344, 	3.1350286, 	2.2543677, 	1.9430337],
@@ -60,17 +62,6 @@ d1 = np.array([[0.0000000, 1.4230670, 	1.2464736, 	2.4829678, 	1.6023069, 	0.744
                 [2.4829678,	3.1350286, 	1.4820114, 	0.0000000, 	1.2678046, 	3.0029345],
                 [1.6023069,	2.2543677, 	0.6013505, 	1.2678046, 	0.0000000, 	2.1222736],
                 [0.7448415,	1.9430337, 	1.7664403, 	3.0029345, 	2.1222736, 	0.0000000]])
-
-CONVERSION_DICT = {
-    "0": "A",
-    "1": "B",
-    "2": "C",
-    "3": "D",
-    "4": "E",
-    "5": "F",
-    "6": "G",
-    "7": "H"
-}
 
 ids = ["A", "B", "C",  "D",  "E",  "F"]
 
